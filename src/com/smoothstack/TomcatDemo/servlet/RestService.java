@@ -85,34 +85,45 @@ public class RestService extends HttpServlet {
 			}
 		} catch (Exception e) {}
 		
-		
-		
-		
-		GsonBuilder builder = new GsonBuilder();
-		builder.serializeNulls();
-		Gson gson = builder.setPrettyPrinting().create();
 		int status = HttpServletResponse.SC_FORBIDDEN;
-
-		Map<String, List<String>> query = StringUtil.getQuery(sb.toString());
-		Credential credential = null;
-		String username = null;
-		String password = null;
 		User user = null;
-		System.out.printf("Query String = %s\n",sb.toString());
+		String payload = sb.toString();
 		
-		if (!query.containsKey("username") ||  !query.containsKey("password") ||
-				(null == (credential = getCredential(username=query.get("username").get(0), password=query.get("password").get(0))))
-				) {
-			credential = new Credential(0, user = null, username, password);
-		}
+		String contentType =request.getContentType();
+		
+		if ("application/x-www-form-urlencoded".equals(contentType)) {
 
-		else {
-			user = credential.getUser();
-			status = HttpServletResponse.SC_OK;
+			Map<String, List<String>> query = StringUtil.getQuery(sb.toString());
+			Credential credential = null;
+			String username = null;
+			String password = null;
+			
+			System.out.printf("Query String = %s\n",sb.toString());
+			
+			if (!query.containsKey("username") ||  !query.containsKey("password") ||
+					(null == (credential = getCredential(username=query.get("username").get(0), password=query.get("password").get(0))))
+					) {
+				credential = new Credential(0, user = null, username, password);
+			}
+	
+			else {
+				user = credential.getUser();
+				status = HttpServletResponse.SC_OK;
+			}
+			
+		} else if ("application/json".equals(contentType)) {
+			Gson gson = new Gson();
+			Credential requestCredential = gson.fromJson(payload, Credential.class);
+			Credential credential = getCredential(requestCredential.getUsername(), requestCredential.getPassword());
+			if (credential.getUser() != null)
+				status = HttpServletResponse.SC_OK;
+				user = credential.getUser();
 		}
 		
 		Map<String, Object> kv = new HashMap<>();
-		
+		GsonBuilder builder = new GsonBuilder();
+		builder.serializeNulls();
+		Gson gson = builder.setPrettyPrinting().create();		
 		kv.put("code",  status);
 		kv.put("user",  user);
 		out.print(gson.toJson(kv));
@@ -134,8 +145,8 @@ public class RestService extends HttpServlet {
 		for (int credId : credentialMap.keySet()) {
 			Credential credential = credentialMap.get(credId);
 			System.out.printf("Checking %s %s\n", username, password);
-			System.out.printf("      -> %s %s\n", credential.getLogin(), credential.getPassword());
-			if (username.equals(credential.getLogin()) && sha256(password).equals(credential.getPassword())) {
+			System.out.printf("      -> %s %s\n", credential.getUsername(), credential.getPassword());
+			if (username.equals(credential.getUsername()) && sha256(password).equals(credential.getPassword())) {
 				return credential;
 			}
 		}

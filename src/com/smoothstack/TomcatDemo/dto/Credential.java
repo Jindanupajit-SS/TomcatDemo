@@ -12,7 +12,7 @@ public class Credential {
 	
 	private int credentialId;
 	private User user;
-	private String login;
+	private String username;
 	private String password;
 	
 	
@@ -24,7 +24,7 @@ public class Credential {
 		
 		setCredentialId(credentialId);
 		setUser(user);
-		setLogin(login);
+		setUsername(login);
 		setPassword(password);
 	}
 	
@@ -44,12 +44,12 @@ public class Credential {
 		this.user = user;
 	}
 	
-	public String getLogin() {
-		return login;
+	public String getUsername() {
+		return username;
 	}
 	
-	public void setLogin(String login) {
-		this.login = login;
+	public void setUsername(String login) {
+		this.username = login;
 	}
 	
 	public String getPassword() {
