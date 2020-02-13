@@ -1,0 +1,5 @@
+com\smoothstack\TomcatDemo\util\StringUtil.class
+com\smoothstack\TomcatDemo\servlet\Demo.class
+com\smoothstack\TomcatDemo\servlet\RestService.class
+com\smoothstack\TomcatDemo\dto\Credential.class
+com\smoothstack\TomcatDemo\dto\User.class
